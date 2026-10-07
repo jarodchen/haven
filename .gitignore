@@ -77,3 +77,10 @@ $RECYCLE.BIN/
 # garden/.env 是插件维护的站点设置（主题、功能开关），不含密钥；
 # CI 构建 Eleventy 时要读它，所以必须入库。真正的密钥只有一条规则拦住：plugins/*/data.json
 !garden/.env
+
+# ===== 7. Eleventy 构建期产物：每次 npm run build 现生成，提交只会攒死文件 =====
+# 主题 css 是 get-theme.js 从主题仓库下载后落的副本，文件名带内容 hash，主题一换就多一份
+.cache/
+src/site/styles/_theme.*.css
+# 站点插件（garden-plugin）的模板由 pluginLoader 在构建时从 src/plugins/ 展开，源已在库里，展开结果不必再存
+src/site/_includes/plugins/
