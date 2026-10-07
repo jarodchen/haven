@@ -1,4 +1,4 @@
-name: Deploy garden to GitHub Pages
+name: Deploy Haven to GitHub Pages
 
 on:
   push:
@@ -17,22 +17,19 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-24.04
-    defaults:
-      run:
-        working-directory: garden
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: garden/package-lock.json
+          cache-dependency-path: package-lock.json
       - run: npm ci
       - run: npm run build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: garden/dist
+          path: dist
 
   deploy:
     needs: build
