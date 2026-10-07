@@ -1,8 +1,0 @@
-{
-  "id": "unsafe",
-  "name": "Unsafe",
-  "version": "1.0.0",
-  "description": "escaping path",
-  "author": "Fixture",
-  "styles": ["../../evil.scss"]
-}

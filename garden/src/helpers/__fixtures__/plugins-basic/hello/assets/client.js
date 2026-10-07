@@ -1,1 +1,0 @@
-// fixture client script
