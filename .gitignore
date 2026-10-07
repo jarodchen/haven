@@ -1,0 +1,77 @@
+# ---------------------------------------------------------------------------
+# Obsidian 库 + Digital Garden 发布仓的忽略规则
+# 原则：知识库的内容、附件、插件本体、插件配置模板要进版本库；
+#       "本机视图状态"和"任何含凭据的文件"绝不进版本库。
+# ---------------------------------------------------------------------------
+
+# ===== 1. 凭据：最高优先级，宁可误杀不可漏 =====
+# Digital Garden 插件把 GitHub Token 明文写在它的 data.json 里。
+# 一旦提交到公开 Pages 仓库，Token 即刻泄露，别人可用它写你的仓库。
+.obsidian/plugins/*/data.json
+# 其他可能带密钥的形态
+.obsidian/plugins/**/*token*
+.obsidian/plugins/**/*secret*
+*.pem
+*.p12
+*.key
+.env
+.env.*
+
+# ===== 2. 本机视图状态：每次开关 Obsidian 都会变，提交只会制造噪音冲突 =====
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
+.obsidian/workspaces.json
+# 图谱布局 / 最近打开 / 会话恢复，同样是个人视图
+.obsidian/graph.json
+.obsidian/session.json
+.obsidian/recent-notes.json
+
+# 文件恢复插件的快照索引，记的是本机历史版本
+.obsidian/slots.json
+
+# ===== 3. Obsidian 回收站与备份 =====
+# Obsidian 删除文件默认移入库内 .trash，不是真删；里面常有过期稿件
+.trash/
+.obsidian/trash/
+.obsidian/backups/
+
+# ===== 4. 写作期草稿：只本地可见，发布靠这里挡，不依赖 frontmatter =====
+# 注意：以 _ 开头的目录在 Obsidian 里排序靠前，是社区常用的草稿约定
+_drafts/
+_private/
+
+# ===== 5. Digital Garden / 静态站构建产物 =====
+# 插件本地导出目录、以及任何静态站生成器的输出，都不该入库
+_site/
+dist/
+build/
+public/
+.jekyll-cache/
+.jekyll-metadata
+.sass-cache/
+.vendor-cache/
+node_modules/
+npm-debug.log*
+yarn-error.log*
+# package-lock.json 必须入库：CI 用 npm ci 严格按锁文件装版本，缺它会直接失败。
+
+# ===== 6. 操作系统与编辑器垃圾 =====
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+*.lnk
+~$*
+.~lock.*#
+*.tmp
+*.swp
+*~
+.idea/
+.vscode/
+# garden/.env 是插件维护的站点设置（主题、功能开关），不含密钥；
+# CI 构建 Eleventy 时要读它，所以必须入库。真正的密钥只有一条规则拦住：plugins/*/data.json
+!garden/.env
