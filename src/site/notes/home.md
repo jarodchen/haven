@@ -1,5 +1,5 @@
 ---
-{"dg-home":true,"dg-publish":true,"title":"Haven","dgShowInlineTitle":true,"permalink":"/home/","tags":["gardenEntry"],"dgPassFrontmatter":true,"dg-note-properties":{"title":"Haven","dgShowInlineTitle":true}}
+{"dg-home":true,"dg-publish":true,"title":"Haven","dgShowInlineTitle":true,"status":"draft","permalink":"/home/","tags":["gardenEntry"],"dgPassFrontmatter":true,"dg-note-properties":{"title":"Haven","dgShowInlineTitle":true,"status":"draft"}}
 ---
 
 
@@ -7,7 +7,7 @@
 
 ## 起点
 
-- [[局外人\|局外人]]  用来看发布链路是否真的通。
+- [[局外人\|局外人]]：用来看发布链路是否真的通。
 
 ## 阅读方式
 
