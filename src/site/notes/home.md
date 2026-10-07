@@ -1,5 +1,5 @@
 ---
-{"dg-home":true,"dg-publish":true,"title":"Haven","dgShowInlineTitle":true,"status":"published","permalink":"/home/","tags":["gardenEntry"],"dgPassFrontmatter":true,"dg-note-properties":{"title":"Haven","dgShowInlineTitle":true,"status":"published"}}
+{"dg-home":true,"dg-publish":true,"title":"Haven","dgShowInlineTitle":true,"status":"published","permalink":"//haven/home/","tags":["gardenEntry"],"dgPassFrontmatter":true,"dg-note-properties":{"title":"Haven","dgShowInlineTitle":true,"status":"published"}}
 ---
 
 
