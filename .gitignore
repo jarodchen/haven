@@ -7,10 +7,12 @@
 # ===== 1. 凭据：最高优先级，宁可误杀不可漏 =====
 # Digital Garden 插件把 GitHub Token 明文写在它的 data.json 里。
 # 一旦提交到公开 Pages 仓库，Token 即刻泄露，别人可用它写你的仓库。
-.obsidian/plugins/*/data.json
+# 规则一律写成 **/.obsidian/... ：含斜杠的模式锚定于 .gitignore 所在目录，
+# 库根一旦挪进子文件夹（如 vault/），简写形式会静默失效、Token 就进了公开仓。
+**/.obsidian/plugins/*/data.json
 # 其他可能带密钥的形态
-.obsidian/plugins/**/*token*
-.obsidian/plugins/**/*secret*
+**/.obsidian/plugins/**/*token*
+**/.obsidian/plugins/**/*secret*
 *.pem
 *.p12
 *.key
@@ -18,23 +20,23 @@
 .env.*
 
 # ===== 2. 本机视图状态：每次开关 Obsidian 都会变，提交只会制造噪音冲突 =====
-.obsidian/workspace.json
-.obsidian/workspace-mobile.json
-.obsidian/cache
-.obsidian/workspaces.json
+**/.obsidian/workspace.json
+**/.obsidian/workspace-mobile.json
+**/.obsidian/cache
+**/.obsidian/workspaces.json
 # 图谱布局 / 最近打开 / 会话恢复，同样是个人视图
-.obsidian/graph.json
-.obsidian/session.json
-.obsidian/recent-notes.json
+**/.obsidian/graph.json
+**/.obsidian/session.json
+**/.obsidian/recent-notes.json
 
 # 文件恢复插件的快照索引，记的是本机历史版本
-.obsidian/slots.json
+**/.obsidian/slots.json
 
 # ===== 3. Obsidian 回收站与备份 =====
 # Obsidian 删除文件默认移入库内 .trash，不是真删；里面常有过期稿件
 .trash/
-.obsidian/trash/
-.obsidian/backups/
+**/.obsidian/trash/
+**/.obsidian/backups/
 
 # ===== 4. 写作期草稿：只本地可见，发布靠这里挡，不依赖 frontmatter =====
 # 注意：以 _ 开头的目录在 Obsidian 里排序靠前，是社区常用的草稿约定
