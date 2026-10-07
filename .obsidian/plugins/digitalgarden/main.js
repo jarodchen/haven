@@ -21395,11 +21395,6 @@ var Publisher = class {
   }
   shouldPublish(file) {
     var _a6;
-    // Published copies keep dg-publish: true, so the plugin's own output folder
-    // would otherwise be re-published as if it held source notes.
-    if (file.path.startsWith(notePathBase(this.settings))) {
-      return false;
-    }
     const frontMatter = (_a6 = this.metadataCache.getCache(file.path)) == null ? void 0 : _a6.frontmatter;
     return hasPublishFlag(frontMatter);
   }
