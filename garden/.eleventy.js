@@ -906,17 +906,18 @@ module.exports = function(eleventyConfig) {
 
   // Pages serves this repo under /haven/, and pathPrefix only rewrites permalinks.
   // The favicon tags and the theme css path come from plugins and _data, which
-  // emit root-absolute hrefs, so prefix them at render time.
+  // emit root-absolute hrefs, so prefix them at render time. Inline scripts fetch
+  // /graph.json and /searchIndex.json the same way, so those get prefixed too —
+  // un-prefixed they hit the account root and the site graph renders empty.
   eleventyConfig.addTransform("pages-path-prefix", function (content) {
     const outputPath =
       (this.page && this.page.outputPath) || this.outputPath || "";
     if (!outputPath.endsWith(".html")) {
       return content;
     }
-    return content.replace(
-      /\b(href|src)="\/(?!haven\/|\/)/g,
-      '$1="/haven/'
-    );
+    return content
+      .replace(/\b(href|src)="\/(?!haven\/|\/)/g, '$1="/haven/')
+      .replace(/\bfetch\(\s*(['"])\/(?!haven\/|\/)/g, "fetch($1/haven/");
   });
 
   userEleventySetup(eleventyConfig);

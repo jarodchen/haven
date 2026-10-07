@@ -28,7 +28,9 @@ function filterLocalGraphData(graphData, depth) {
     depth = depth || 1;
     const allNodes = JSON.parse(JSON.stringify(graphData.nodes));
     const allLinks = JSON.parse(JSON.stringify(graphData.links));
-    let currentLink = decodeURI(window.location.pathname);
+    // graph.json keys are site-root paths, but Pages mounts the site at /haven/,
+    // so strip that prefix before looking the current page up.
+    let currentLink = decodeURI(window.location.pathname).replace(/^\/haven/, "") || "/";
 
     let currentNode = allNodes[currentLink];
     if (!currentNode) {
@@ -341,7 +343,7 @@ function renderGraph(graphData, containerId, isFullScreen) {
                 const dist = Math.sqrt(dx * dx + dy * dy);
                 if (dt < 500 && dist < 5) {
                     if (node.url) {
-                        window.location = node.url;
+                        window.location = "/haven" + node.url;
                     }
                 }
             })
