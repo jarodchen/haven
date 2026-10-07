@@ -1,17 +1,13 @@
 ---
-dg-publish: true
-tags:
-  - gardenEntry
-permalink: /
-title: Haven
-dgShowInlineTitle: false
+{"dg-home":true,"dg-publish":true,"title":"Haven","dgShowInlineTitle":true,"permalink":"/home/","tags":["gardenEntry"],"dgPassFrontmatter":true,"dg-note-properties":{"title":"Haven","dgShowInlineTitle":true}}
 ---
+
 
 这里是我的知识花园。笔记在 Obsidian 里写，改动合进 GitHub 后由 Pages 自动重建。
 
 ## 起点
 
-- [[test|第一篇测试笔记]]：用来看发布链路是否真的通。
+- [[test\|第一篇测试笔记]]：用来看发布链路是否真的通。
 
 ## 阅读方式
 
