@@ -1,13 +1,16 @@
 ---
-{"dg-home":true,"dg-publish":true,"title":"Haven","dgShowInlineTitle":true,"status":"draft","permalink":"/home/","tags":["gardenEntry"],"dgPassFrontmatter":true,"dg-note-properties":{"title":"Haven","dgShowInlineTitle":true,"status":"draft"}}
+dg-home: true
+dg-publish: true
+title: Haven
+dgShowInlineTitle: true
+status: published
 ---
-
 
 这里是我的知识花园。笔记在 Obsidian 里写，改动合进 GitHub 后由 Pages 自动重建。
 
 ## 起点
 
-- [[局外人\|局外人]]：用来看发布链路是否真的通。
+- [[笔记/博客-haven/局外人\|局外人]]：用来看发布链路是否真的通。
 
 ## 阅读方式
 
