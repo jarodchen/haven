@@ -3,7 +3,6 @@ dg-publish: true
 tags:
   - gardenEntry
 permalink: /
-dg-home: true
 title: Haven
 dgShowInlineTitle: false
 ---
