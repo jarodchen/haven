@@ -1,5 +1,4 @@
 {
-  "userIgnoreFilters": [
-    "garden/"
-  ]
+  "readableLineLength": false,
+  "showLineNumber": true
 }
