@@ -1,5 +1,5 @@
 ---
-{"dg-home":true,"dg-publish":true,"title":"Haven","dgShowInlineTitle":true,"status":"published","permalink":"//haven/home/","tags":["gardenEntry"],"dgPassFrontmatter":true,"dg-note-properties":{"title":"Haven","dgShowInlineTitle":true,"status":"published"}}
+{"dg-home":true,"dg-publish":true,"title":"Haven","dgShowInlineTitle":true,"status":"published","permalink":"/home/","tags":["gardenEntry"],"dgPassFrontmatter":true,"dg-note-properties":{"title":"Haven","dgShowInlineTitle":true,"status":"published"}}
 ---
 
 
@@ -14,4 +14,4 @@
 - 左侧目录由已发布的笔记生成，点标题 Haven 回到本页。
 - 想新增一页：在库里新建笔记，属性写 `dg-publish: true`，发布即可。
 
-[[笔记/博客-haven/剑来\|剑来]]
+[[剑来\|剑来]]
