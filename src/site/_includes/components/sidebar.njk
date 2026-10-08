@@ -20,11 +20,6 @@
                         {%set tocHtml= (content and (content | hideDataview | link | toc)) %}
                         {%if tocHtml %}
                               <div class="toc">
-                                    <div class="toc-title-container">
-                                          <div class="toc-title">
-                                                {% if title %}{{ title }}{% else %}{{ page.fileSlug }}{% endif %}
-                                          </div>
-                                    </div>
                                     <div class="toc-container">
                                           {{ tocHtml | safe }}
                                     </div>
@@ -33,6 +28,8 @@
                                     (function() {
                                           const tocLinks = document.querySelectorAll('.toc-container a[href^="#"]');
                                           if (!tocLinks.length) return;
+
+                                          const scrollContainer = document.querySelector('.content') || window;
 
                                           const headings = Array.from(tocLinks).map(link => {
                                                 const id = decodeURIComponent(link.getAttribute('href').slice(1));
@@ -50,7 +47,24 @@
                                                 if (current) current.link.classList.add('toc-active');
                                           }
 
-                                          window.addEventListener('scroll', updateActive, { passive: true });
+                                          // 监听内容区滚动（而非 window）
+                                          scrollContainer.addEventListener('scroll', updateActive, { passive: true });
+
+                                          // 点击 TOC 链接时，滚动内容区到对应标题
+                                          tocLinks.forEach(link => {
+                                                link.addEventListener('click', function(e) {
+                                                      const id = decodeURIComponent(this.getAttribute('href').slice(1));
+                                                      const target = document.getElementById(id);
+                                                      if (target && scrollContainer !== window) {
+                                                            e.preventDefault();
+                                                            scrollContainer.scrollTo({
+                                                                  top: target.offsetTop - 20,
+                                                                  behavior: 'smooth'
+                                                            });
+                                                      }
+                                                });
+                                          });
+
                                           updateActive();
                                     })();
                               </script>

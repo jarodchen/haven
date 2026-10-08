@@ -1,5 +1,5 @@
 ---
-{"dg-home":true,"dg-publish":true,"title":"Haven","dgShowInlineTitle":true,"status":"published","permalink":"//haven/home/","tags":["gardenEntry"],"dgPassFrontmatter":true,"dg-note-properties":{"title":"Haven","dgShowInlineTitle":true,"status":"published"}}
+{"dg-home":true,"dg-publish":true,"title":"Haven","dgShowInlineTitle":true,"status":"published","tags":["gardenEntry"],"dgPassFrontmatter":true,"dg-note-properties":{"title":"Haven","dgShowInlineTitle":true,"status":"published"}}
 ---
 
 
@@ -9,7 +9,12 @@
 
 用来看发布链路是否真的通。
 
+## 笔记
+
+- [[剑来-里藏着一部中国思想史|《剑来》里的中国思想史]] — 角色原型与思想脉络解读
+
 ## 阅读方式
 
 - 左侧目录由已发布的笔记生成，点标题 Haven 回到本页。
 - 想新增一页：在库里新建笔记，属性写 `dg-publish: true`，发布即可。
+- 右侧面板是关系图谱（Connected Pages），展示笔记之间的双向链接；点地球图标看全站图谱。

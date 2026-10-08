@@ -91,7 +91,11 @@ const sortTree = (unsorted, navigationOrder, currentPath) => {
 };
 
 function getPermalinkMeta(note, key) {
-  let permalink = "/";
+  // Use note.url (the final rendered URL from Eleventy) instead of
+  // note.data.permalink. Layout-defined permalinks like "notes/{{slug}}/"
+  // are template strings in data.permalink and won't render correctly
+  // when emitted directly into the filetree template.
+  let permalink = note.url || "/";
   let parts = note.filePathStem.split("/");
   let name = parts[parts.length - 1];
   let noteIcon = process.env.NOTE_ICON_DEFAULT;
@@ -99,9 +103,6 @@ function getPermalinkMeta(note, key) {
   let pinned = false;
   let folders = null;
   try {
-    if (note.data.permalink) {
-      permalink = note.data.permalink;
-    }
     if (note.data.tags && note.data.tags.indexOf("gardenEntry") != -1) {
       permalink = "/";
     }    

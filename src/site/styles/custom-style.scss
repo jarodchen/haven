@@ -3,11 +3,416 @@ body {
       ADD YOUR CUSTOM STYLING HERE. (INSIDE THE body {...} section.)
       IT WILL TAKE PRECEDENCE OVER THE STYLING IN THE STYLE.CSS FILE.
    ***/
-    //  background-color: white;
-    //  .content {
-    //   font-size: 14px;
-    //  }
-    //  h1 {
-    //   color: black;
-    //  }
+
+    /* ===== 全局变量覆盖 ===== */
+    --dg-content-padding-top: 30px;
+
+    /* ================================================================
+       桌面端三栏布局（>= 1001px）
+       统一使用 flexbox，body 为容器，三栏为 flex item
+       左侧折叠时内容区自动伸缩，右侧边栏位置不变
+       ================================================================ */
+    @media (min-width: 1001px) {
+        &:not(.no-filetree) {
+            /* body 作为 flex 容器 */
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+
+            /* ---------- 左侧导航栏 ---------- */
+            .filetree-wrapper {
+                position: static !important;
+                width: 250px !important;
+                min-width: 250px !important;
+                max-width: 250px !important;
+                flex-shrink: 0;
+                height: 100vh;
+                overflow: hidden;
+                transition: width 0.25s ease, min-width 0.25s ease;
+
+                .filetree-sidebar {
+                    width: 100% !important;
+                    height: 100vh;
+                    overflow-y: auto;
+                    overflow-x: hidden;
+                    box-sizing: border-box;
+                }
+            }
+
+            /* ---------- 内容区 ---------- */
+            .content {
+                flex: 1;
+                min-width: 0;
+                height: 100vh;
+                overflow-y: auto;
+                overflow-x: hidden;
+                margin: 0 !important;
+                max-width: none !important;
+                padding: 30px 48px 60px !important;
+                box-sizing: border-box;
+            }
+
+            /* ---------- 右侧边栏 ---------- */
+            .sidebar {
+                position: static !important;
+                width: 320px !important;
+                min-width: 320px !important;
+                max-width: 320px !important;
+                flex-shrink: 0;
+                height: 100vh;
+                overflow: hidden;
+                margin: 0 !important;
+                padding: 0 !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                transform: none !important;
+                visibility: visible !important;
+                background-color: var(--background-primary) !important;
+                border-left: 1px solid var(--background-modifier-border, rgba(255,255,255,0.06));
+
+                .sidebar-container {
+                    height: 100vh !important;
+                    max-height: 100vh !important;
+                    overflow-y: auto !important;
+                    overflow-x: hidden !important;
+                    padding: 24px 20px !important;
+                    box-sizing: border-box;
+                    display: flex;
+                    flex-direction: column;
+
+                    /* 右侧边栏内部顺序：图谱 → TOC → 反向链接 */
+                    .graph { order: -3 !important; }
+                    .toc { order: 0 !important; }
+                    .backlinks { order: 1 !important; }
+                }
+            }
+
+            /* 隐藏移动端底部面板控制元素 */
+            .page-panel-toggle,
+            .page-panel-backdrop,
+            .page-panel-header,
+            .page-panel-fab,
+            .floating-actions {
+                display: none !important;
+            }
+
+            /* ---------- 折叠状态 ---------- */
+            &.filetree-collapsed {
+                .filetree-wrapper {
+                    width: 52px !important;
+                    min-width: 52px !important;
+                    max-width: 52px !important;
+                }
+
+                .filetree-sidebar {
+                    padding: 10px 6px !important;
+
+                    > *:not(.filetree-collapse-btn) {
+                        display: none !important;
+                    }
+
+                    .filetree-collapse-btn {
+                        position: static;
+                        width: 100%;
+                        margin-top: 4px;
+
+                        .icon-close { display: none; }
+                        .icon-open { display: block; }
+                    }
+                }
+                /* 内容区和右侧边栏不需要手动调整，flexbox 自动处理 */
+            }
+        }
+    }
+
+    /* ================================================================
+       滚动条统一样式（细、半透明）
+       ================================================================ */
+    .filetree-sidebar,
+    .content,
+    .sidebar-container {
+        scrollbar-width: thin;
+        scrollbar-color: var(--background-modifier-border, rgba(255,255,255,0.15)) transparent;
+
+        &::-webkit-scrollbar {
+            width: 5px;
+        }
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: var(--background-modifier-border, rgba(255,255,255,0.15));
+            border-radius: 3px;
+        }
+        &::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted, rgba(255,255,255,0.3));
+        }
+    }
+
+    /* ================================================================
+       左侧导航栏折叠按钮
+       ================================================================ */
+    .filetree-sidebar {
+        position: relative;
+    }
+
+    .filetree-collapse-btn {
+        position: absolute;
+        top: 14px;
+        right: 10px;
+        background: none;
+        border: none;
+        color: var(--text-muted, #888);
+        cursor: pointer;
+        padding: 6px;
+        border-radius: 6px;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.2s, background 0.2s;
+
+        &:hover {
+            color: var(--text-normal, #fff);
+            background: var(--background-modifier-hover, rgba(255,255,255,0.1));
+        }
+
+        .icon-open { display: none; }
+        .icon-close { display: block; }
+
+        svg {
+            width: 18px;
+            height: 18px;
+        }
+    }
+
+    /* ================================================================
+       关系图谱：常驻右侧边栏顶部
+       ================================================================ */
+    .sidebar .graph {
+        --dg-graph-width: 100%;
+        --dg-graph-height: 220px;
+        width: 100%;
+        min-height: 220px;
+        margin-bottom: 24px;
+        background: none;
+        border-radius: 0;
+        padding: 0;
+        border: none;
+
+        #link-graph {
+            width: 100% !important;
+            height: 200px !important;
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--background-secondary, rgba(255,255,255,0.02));
+            border: 1px solid var(--background-modifier-border, rgba(255,255,255,0.06));
+        }
+    }
+
+    /* 图谱标题栏 */
+    .graph-title-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+
+        .graph-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted, #888);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #graph-controls {
+            background: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            display: flex;
+            gap: 4px;
+
+            .ctrl-left {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                margin-right: 8px;
+
+                #graph-depth-label {
+                    font-size: 0.7rem;
+                    color: var(--text-muted, #888);
+                }
+
+                #graph-depth-slider {
+                    width: 50px;
+                    height: 3px;
+                    -webkit-appearance: none;
+                    appearance: none;
+                    background: var(--background-modifier-border, rgba(255,255,255,0.15));
+                    border-radius: 2px;
+                    outline: none;
+
+                    &::-webkit-slider-thumb {
+                        -webkit-appearance: none;
+                        appearance: none;
+                        width: 12px;
+                        height: 12px;
+                        border-radius: 50%;
+                        background: var(--text-accent, #6cf);
+                        cursor: pointer;
+                    }
+                }
+            }
+
+            .ctrl-right {
+                display: flex;
+                gap: 2px;
+            }
+
+            span {
+                cursor: pointer;
+                padding: 4px;
+                border-radius: 4px;
+                color: var(--text-muted, #888);
+                transition: color 0.2s, background 0.2s;
+
+                &:hover {
+                    color: var(--text-accent, #6cf);
+                    background: var(--background-modifier-hover, rgba(255,255,255,0.08));
+                }
+
+                svg {
+                    width: 14px;
+                    height: 14px;
+                }
+            }
+        }
+    }
+
+    /* 全屏图谱弹窗 */
+    #full-graph {
+        background-color: rgba(0, 0, 0, 0.7) !important;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+
+        #full-graph-container {
+            width: min(900px, 90vw) !important;
+            height: min(650px, 80vh) !important;
+            border-radius: 16px !important;
+            border: 1px solid var(--background-modifier-border, rgba(255,255,255,0.15));
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        #full-graph-close {
+            top: 16px !important;
+            right: 16px !important;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--background-secondary, rgba(255,255,255,0.1));
+            transition: background 0.2s, transform 0.2s;
+
+            &:hover {
+                background: var(--background-modifier-hover, rgba(255,255,255,0.2));
+                transform: scale(1.1);
+            }
+
+            svg {
+                width: 18px;
+                height: 18px;
+            }
+        }
+    }
+
+    /* ================================================================
+       TOC 目录 & 反向链接样式
+       ================================================================ */
+    .sidebar {
+        .toc-container {
+            max-height: none !important;
+            overflow-y: visible !important;
+        }
+
+        .toc,
+        .backlinks {
+            margin-bottom: 24px;
+
+            .toc-title,
+            .backlink-title {
+                font-size: 0.7rem;
+                font-weight: 600;
+                color: var(--text-muted, #888);
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                margin-bottom: 10px;
+                padding-bottom: 8px;
+                border-bottom: 1px solid var(--background-modifier-border, rgba(255,255,255,0.08));
+            }
+        }
+    }
+
+    /* TOC 链接 */
+    .toc .toc-container nav.toc ol {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+
+        li {
+            margin: 0;
+            ol { padding-left: 12px; }
+        }
+    }
+
+    .toc .toc-container a {
+        font-size: 0.82rem;
+        color: var(--text-muted, #999);
+        text-decoration: none;
+        display: block;
+        padding: 3px 0;
+        line-height: 1.4;
+        transition: color 0.2s, padding-left 0.2s;
+
+        &:hover, &.toc-active {
+            color: var(--text-accent, #6cf);
+            padding-left: 4px;
+        }
+    }
+
+    /* 反向链接 */
+    .backlinks .backlink-list .backlink-card {
+        padding: 5px 0;
+        border-bottom: 1px solid var(--background-modifier-border, rgba(255,255,255,0.05));
+
+        &:last-child { border-bottom: none; }
+
+        .backlink {
+            font-size: 0.82rem;
+            color: var(--text-normal, #ddd);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+
+            &:hover { color: var(--text-accent, #6cf); }
+
+            svg {
+                width: 12px;
+                height: 12px;
+                flex-shrink: 0;
+                opacity: 0.6;
+            }
+        }
+
+        .no-backlinks-message {
+            font-size: 0.8rem;
+            color: var(--text-faint, #666);
+            font-style: italic;
+        }
+    }
 }

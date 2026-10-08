@@ -237,6 +237,12 @@ const markdownFileTypeRegex = /\.(md|markdown)$/i;
 const isMarkdownPage = (inputPath) => inputPath && inputPath.match(markdownFileTypeRegex);
 
 module.exports = function(eleventyConfig) {
+  // Single source of truth for the deploy sub-path. GitHub Pages serves this
+  // repo at /haven/, so every absolute URL needs this prefix. Used by both
+  // Eleventy's pathPrefix and the pages-path-prefix transform below.
+  const SITE_PREFIX = "/haven/";
+  const prefixNoSlash = SITE_PREFIX.replace(/\/$/, ""); // "/haven"
+
   eleventyConfig.setLiquidOptions({
     dynamicPartials: true,
   });
@@ -863,7 +869,7 @@ module.exports = function(eleventyConfig) {
   eleventyConfig.addPlugin(faviconsPlugin, { outputDir: "dist" });
   eleventyConfig.addPlugin(tocPlugin, {
     ul: true,
-    tags: ["h1", "h2", "h3", "h4", "h5", "h6"],
+    tags: ["h2", "h3", "h4", "h5", "h6"],
   });
 
   // Canvas files are pre-compiled HTML by the plugin - don't process as markdown
@@ -904,7 +910,7 @@ module.exports = function(eleventyConfig) {
 
   pluginLoader.applyEleventyHooks(eleventyConfig);
 
-  // Pages serves this repo under /haven/, and pathPrefix only rewrites permalinks.
+  // Pages serves this repo under SITE_PREFIX, and pathPrefix only rewrites permalinks.
   // The favicon tags and the theme css path come from plugins and _data, which
   // emit root-absolute hrefs, so prefix them at render time. Inline scripts fetch
   // /graph.json and /searchIndex.json the same way, so those get prefixed too —
@@ -915,9 +921,10 @@ module.exports = function(eleventyConfig) {
     if (!outputPath.endsWith(".html")) {
       return content;
     }
+    // Negative lookahead skips URLs that already carry the prefix or are protocol-relative ("//")
     return content
-      .replace(/\b(href|src)="\/(?!haven\/|\/)/g, '$1="/haven/')
-      .replace(/\bfetch\(\s*(['"])\/(?!haven\/|\/)/g, "fetch($1/haven/");
+      .replace(new RegExp(`\\b(href|src)="\\/(?!${prefixNoSlash.slice(1)}\\/|\\/)`, 'g'), `$1="${prefixNoSlash}/`)
+      .replace(new RegExp(`\\bfetch\\(\\s*(['"])\\/(?!${prefixNoSlash.slice(1)}\\/|\\/)`, 'g'), `fetch($1${prefixNoSlash}/`);
   });
 
   userEleventySetup(eleventyConfig);
@@ -927,10 +934,11 @@ module.exports = function(eleventyConfig) {
       input: "src/site",
       output: "dist",
       data: `_data`,
-      // Pages serves this site under the repo name, so every URL needs it;
-      // templates would otherwise emit root-absolute links that 404.
-      pathPrefix: "/haven/",
     },
+    // Pages serves this site under the repo name. pathPrefix is a top-level
+    // Eleventy config (not inside dir) so the `url` filter and page.url
+    // prefixing actually take effect.
+    pathPrefix: SITE_PREFIX,
     templateFormats: ["njk", "md", "11ty.js", "canvas"],
     htmlTemplateEngine: "njk",
     markdownTemplateEngine: false,

@@ -24,7 +24,8 @@
         {%endif%}
     {% endmacro %}
 
-    <div x-init="isDesktop = (window.innerWidth>=1000) ? true: false;"
+    <div x-init="isDesktop = (window.innerWidth>=1000) ? true: false;
+                    if (localStorage.getItem('filetree-collapsed') === 'true') { document.body.classList.add('filetree-collapsed'); }"
             x-on:resize.window="isDesktop = (window.innerWidth>=1000) ? true : false;"
             x-data="{isDesktop: true, showFilesMobile: false}">
 
@@ -58,8 +59,14 @@
 
         <div x-show="showFilesMobile && !isDesktop" @click="showFilesMobile = false" style="display:none;" class="fullpage-overlay"></div>
 
-      <div class="filetree-wrapper" x-show.important="isDesktop || showFilesMobile" style="display: none;">
+      <div class="filetree-wrapper" id="filetree-wrapper" data-turbo-permanent x-show.important="isDesktop || showFilesMobile" style="display: none;">
       <nav class="filetree-sidebar">
+        <button type="button" class="filetree-collapse-btn" aria-label="Toggle sidebar"
+                x-on:click="document.body.classList.toggle('filetree-collapsed');
+                           localStorage.setItem('filetree-collapsed', document.body.classList.contains('filetree-collapsed'));">
+          <i data-lucide="panel-left-close" class="icon-close"></i>
+          <i data-lucide="panel-left-open" class="icon-open"></i>
+        </button>
         {% for imp in dynamics.filetree.beforeTitle %}
             {% include imp %}
         {% endfor %}

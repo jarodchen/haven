@@ -1,5 +1,131 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>window.__sitePrefix = "{{ '/' | url }}";</script>
+
+<!-- PJAX: 客户端无刷新导航，左侧导航栏保持固定 -->
+<script>
+window.__pjaxLoaded = true;
+(function() {
+    var isNavigating = false;
+    window.__pjaxDebug = [];
+
+    function shouldInterceptLink(link) {
+        if (!link || !link.href) return false;
+        if (link.target && link.target !== '_self') return false;
+        if (link.hasAttribute('download')) return false;
+        if (link.protocol !== location.protocol) return false;
+        if (link.host !== location.host) return false;
+        if (link.getAttribute('href').charAt(0) === '#') return false;
+        return true;
+    }
+
+    function reexecuteScripts(container) {
+        var scripts = container.querySelectorAll('script');
+        scripts.forEach(function(oldScript) {
+            // 跳过 module 脚本（图谱等），它们的全局 API 已存在，通过调用 API 重新渲染
+            if (oldScript.type === 'module') return;
+
+            var newScript = document.createElement('script');
+            // 复制所有属性
+            Array.from(oldScript.attributes).forEach(function(attr) {
+                newScript.setAttribute(attr.name, attr.value);
+            });
+            if (oldScript.src) {
+                newScript.src = oldScript.src;
+            } else {
+                newScript.textContent = oldScript.textContent;
+            }
+            oldScript.parentNode.replaceChild(newScript, oldScript);
+        });
+    }
+
+    function afterPjaxRender(container) {
+        // 重新初始化 Alpine.js 组件
+        if (window.Alpine && Alpine.initTree) {
+            Alpine.initTree(container);
+        }
+        // 重新渲染关系图谱（如果全局 API 存在）
+        if (window.__graph && window.__graph.rerenderLocal) {
+            setTimeout(function() {
+                try { window.__graph.rerenderLocal(); } catch(e) {}
+            }, 50);
+        }
+        // 重新初始化 lucide 图标
+        if (window.lucide && lucide.createIcons) {
+            lucide.createIcons();
+        }
+    }
+
+    function loadPage(url, pushState) {
+        if (isNavigating) return;
+        isNavigating = true;
+        window.__pjaxDebug.push('loading: ' + url);
+
+        fetch(url)
+            .then(function(res) { return res.text(); })
+            .then(function(html) {
+                var parser = new DOMParser();
+                var doc = parser.parseFromString(html, 'text/html');
+                document.title = doc.title;
+
+                var newContent = doc.querySelector('.content');
+                var oldContent = document.querySelector('.content');
+                if (newContent && oldContent) {
+                    oldContent.innerHTML = newContent.innerHTML;
+                    reexecuteScripts(oldContent);
+                    afterPjaxRender(oldContent);
+                }
+
+                var newSidebar = doc.querySelector('.sidebar');
+                var oldSidebar = document.querySelector('.sidebar');
+                if (newSidebar && oldSidebar) {
+                    oldSidebar.innerHTML = newSidebar.innerHTML;
+                    reexecuteScripts(oldSidebar);
+                    afterPjaxRender(oldSidebar);
+                }
+
+                if (localStorage.getItem('filetree-collapsed') === 'true') {
+                    document.body.classList.add('filetree-collapsed');
+                } else {
+                    document.body.classList.remove('filetree-collapsed');
+                }
+
+                var content = document.querySelector('.content');
+                if (content) content.scrollTop = 0;
+
+                if (pushState) {
+                    history.pushState({ pjax: true }, '', url);
+                }
+
+                isNavigating = false;
+                window.__pjaxDebug.push('done');
+            })
+            .catch(function(err) {
+                isNavigating = false;
+                window.__pjaxDebug.push('error: ' + err);
+                window.location.href = url;
+            });
+    }
+
+    document.addEventListener('click', function(e) {
+        var link = e.target.closest('a');
+        window.__pjaxDebug.push('click: ' + (link ? link.href : 'no link'));
+        if (!shouldInterceptLink(link)) return;
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+        e.preventDefault();
+        e.stopPropagation();
+        loadPage(link.href, true);
+    }, true);
+
+    window.addEventListener('popstate', function(e) {
+        if (e.state && e.state.pjax) {
+            loadPage(location.href, false);
+        }
+    });
+
+    window.__loadPage = loadPage;
+})();
+</script>
 
 {% if metatags %}
     {% for name, content in metatags %}
@@ -39,14 +165,14 @@
 <script src="https://fastly.jsdelivr.net/npm/whatwg-fetch@3.6.2/dist/fetch.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer" async></script>
 
 {%-if meta.themeStyle%}
-    <link href="/haven/styles/obsidian-base.css" rel="stylesheet">
+    <link href="/styles/obsidian-base.css" rel="stylesheet">
     <link href="{{meta.themeStyle}}" rel="stylesheet">
 {% else %}
-    <link href="/haven/styles/style.css" rel="stylesheet">
+    <link href="/styles/style.css" rel="stylesheet">
 {%endif%}
-<link href="/haven/styles/digital-garden-base.css" rel="stylesheet">
+<link href="/styles/digital-garden-base.css" rel="stylesheet">
 
-<link href="/haven/styles/custom-style.css" rel="stylesheet">
+<link href="/styles/custom-style.css" rel="stylesheet">
 {#- Plugin styles load before user styles so user CSS keeps the last word -#}
 {%- for style in plugins.styles -%}
 <link href="{{style}}?v={{meta.buildDate|isoDate}}" rel="stylesheet">

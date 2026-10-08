@@ -25,6 +25,34 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
       - run: npm ci
+      # .env is gitignored (it may hold local-only overrides), but the site
+      # feature flags (dgShowFileTree, dgShowLocalGraph, etc.) live there.
+      # Write a production .env here so the Pages build has navigation,
+      # graph, backlinks etc. — without it every flag defaults to false and
+      # the deployed site has no sidebar or graph.
+      - name: Create production .env
+        run: |
+          cat > .env <<'EOF'
+          THEME=https://raw.githubusercontent.com/seanwcom/Red-Graphite-for-Obsidian/HEAD/theme.css
+          BASE_THEME=dark
+          dgHomeLink=true
+          dgShowBacklinks=true
+          dgShowLocalGraph=true
+          dgShowGraphDepthControl=true
+          dgShowInlineTitle=false
+          dgShowFileTree=true
+          dgEnableSearch=false
+          dgShowToc=true
+          dgLinkPreview=false
+          dgShowTags=true
+          SITE_NAME_HEADER=Haven
+          SITE_BASE_URL=https://jarodchen.github.io/haven
+          SITE_MAIN_LANGUAGE=en
+          SHOW_CREATED_TIMESTAMP=false
+          SHOW_UPDATED_TIMESTAMP=false
+          NOTE_ICON_DEFAULT=
+          dgPassFrontmatter=true
+          EOF
       - run: npm run build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

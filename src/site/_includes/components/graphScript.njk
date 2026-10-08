@@ -7,8 +7,19 @@ import { drag as d3Drag } from 'd3-drag';
 // Pixi v7 loaded as UMD global
 const { Application, Container, Graphics, Text, Circle } = PIXI;
 
+// Site path prefix (e.g. "/haven/" for GitHub Pages project sites, "/" for root).
+// Injected by pageheader.njk from Eleventy's pathPrefix via {{ '/' | url }}.
+const __sitePrefix = window.__sitePrefix || "/";
+
+function stripPrefix(pathname) {
+    if (__sitePrefix !== "/" && pathname.startsWith(__sitePrefix)) {
+        return pathname.slice(__sitePrefix.length - 1) || "/";
+    }
+    return pathname || "/";
+}
+
 async function fetchGraphData() {
-    const graphData = await fetch('/graph.json').then(res => res.json());
+    const graphData = await fetch(__sitePrefix + 'graph.json').then(res => res.json());
     const fullGraphData = filterFullGraphData(graphData);
     return { graphData, fullGraphData };
 }
@@ -28,9 +39,8 @@ function filterLocalGraphData(graphData, depth) {
     depth = depth || 1;
     const allNodes = JSON.parse(JSON.stringify(graphData.nodes));
     const allLinks = JSON.parse(JSON.stringify(graphData.links));
-    // graph.json keys are site-root paths, but Pages mounts the site at /haven/,
-    // so strip that prefix before looking the current page up.
-    let currentLink = decodeURI(window.location.pathname).replace(/^\/haven/, "") || "/";
+    // graph.json keys are site-root paths; strip the deploy prefix before lookup.
+    let currentLink = stripPrefix(decodeURI(window.location.pathname));
 
     let currentNode = allNodes[currentLink];
     if (!currentNode) {
@@ -343,7 +353,7 @@ function renderGraph(graphData, containerId, isFullScreen) {
                 const dist = Math.sqrt(dx * dx + dy * dy);
                 if (dt < 500 && dist < 5) {
                     if (node.url) {
-                        window.location = "/haven" + node.url;
+                        window.location = (__sitePrefix.endsWith("/") ? __sitePrefix.slice(0, -1) : __sitePrefix) + node.url;
                     }
                 }
             })
@@ -466,7 +476,7 @@ function init() {
 // Below 1400px the sidebar is a closed bottom sheet (page panel),
 // so the local graph is not visible. Skip the data fetch and the Pixi render
 // until the sheet first opens or the viewport grows past the breakpoint.
-const pagePanelMedia = window.matchMedia('(max-width: 1400px)');
+const pagePanelMedia = window.matchMedia('(max-width: 1100px)');
 function localGraphHidden() {
     const panel = document.getElementById('page-panel');
     return pagePanelMedia.matches && panel && !panel.classList.contains('is-open');
@@ -523,11 +533,12 @@ document.addEventListener('forestry:css-changed', function() {
     if (graphDataCache) renderLocal();
 });
 
-if (!localGraphHidden()) init();
-document.addEventListener('page-panel:open', () => init());
-pagePanelMedia.addEventListener('change', evt => {
-    if (!evt.matches) init();
-});
+// Always initialize the local graph so it renders in the sidebar immediately.
+// (Previously it was skipped below 1400px, which left the sidebar empty and
+// made the graph only appear as a fullscreen modal.)
+init();
+document.addEventListener('page-panel:open', () => { if (graphDataCache) renderLocal(); });
+pagePanelMedia.addEventListener('change', () => { if (graphDataCache) renderLocal(); });
 </script>
 
 <div id="graph-component" class="graph" x-data="{ showFullGraph: false, graphDepth: 1 }">
